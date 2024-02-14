@@ -7,7 +7,7 @@ export class TestController {
   @Get()
   getTest(@Res() res: Response) {
     return res.status(200).json({
-      test: "test",
+      test: "test"
     });
   }
 }

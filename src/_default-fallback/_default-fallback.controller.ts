@@ -1,9 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get } from "@nestjs/common";
 
-@Controller('*')
+
+@Controller("*")
 export class DefaultFallbackController {
   @Get()
   incorrectRoute() {
-    return 'Incorrect route';
+    return "Incorrect route";
   }
 }
