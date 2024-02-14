@@ -8,14 +8,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle("Cats example")
-    .setDescription("The cats API description")
+    .setTitle("Dev-in.tw API Document")
+    // .setDescription("The Dev-in.tw API description")
     .setVersion("1.0")
-    .addTag("cats")
+    // .addTag("cats")
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("document", app, document);
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();
