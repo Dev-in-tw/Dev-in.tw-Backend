@@ -13,7 +13,9 @@ describe("TestController", () => {
     controller = module.get<TestController>(TestController);
   });
 
-  it("should be defined", () => {
-    expect(controller).toBeDefined();
+  it("should return a test json object which contains test message", () => {
+    expect(controller.getTest()).toStrictEqual({
+      message: "test route"
+    });
   });
 });

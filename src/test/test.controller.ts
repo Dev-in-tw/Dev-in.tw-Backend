@@ -1,13 +1,12 @@
-import { Controller, Get, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Controller, Get } from "@nestjs/common";
 
 
 @Controller("test")
 export class TestController {
   @Get()
-  getTest(@Res() res: Response) {
-    return res.status(200).json({
-      test: "test"
-    });
+  getTest() {
+    return {
+      message: "test route"
+    };
   }
 }
