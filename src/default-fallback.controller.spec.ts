@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { DefaultFallbackController } from "./_default-fallback.controller";
+
+import { DefaultFallbackController } from "../_module/DefaultFallback/default-fallback.controller";
 
 
 describe("DefaultFallbackController", () => {
@@ -15,7 +16,9 @@ describe("DefaultFallbackController", () => {
     );
   });
 
-  it("should be defined", () => {
-    expect(controller).toBeDefined();
+  it("should return an json object with message 'Incorrect route'", () => {
+    expect(controller.incorrectRoute()).toStrictEqual({
+      message: "Incorrect route"
+    });
   });
 });
