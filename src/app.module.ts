@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 
 import { AppController } from "./app.controller";
 import { DefaultFallbackModule } from "../_module/DefaultFallback/default-fallback.module";
@@ -9,7 +10,15 @@ import { AuthModule } from "./auth/auth.module";
 
 
 @Module({
-  imports: [TestModule, UserModule, AuthModule, DefaultFallbackModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: ".env"
+    }),
+    TestModule,
+    UserModule,
+    AuthModule,
+    DefaultFallbackModule
+  ],
   controllers: [AppController]
 })
 export class AppModule implements NestModule {
