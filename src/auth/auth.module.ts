@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 
-@Module({})
+import { GithubModule } from "./github/github.module";
+
+
+@Module({
+  imports: [GithubModule]
+})
 export class AuthModule {}
