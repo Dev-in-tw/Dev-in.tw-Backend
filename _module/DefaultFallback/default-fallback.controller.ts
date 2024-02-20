@@ -1,6 +1,6 @@
 import { All, Controller, HttpCode } from "@nestjs/common";
 
-import { HttpStatus } from "../../_StatusCode/HTTP";
+import { HttpStatus } from "../../_status-code/HTTP";
 
 
 @Controller("*")

@@ -1,4 +1,4 @@
-export class GitHubEmailApiResponseDto {
+export class GithubEmailApiResponseDto {
   email: string;
   verified: boolean;
   primary: boolean;
