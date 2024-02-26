@@ -1,4 +1,5 @@
 import { User, UserSchema } from "_types/database/user";
+import { CustomError } from "_module/CustomError";
 import profile from "_module/Database/_schema/user";
 
 
@@ -13,7 +14,9 @@ async function readData(key: string, value: any) {
     })) as unknown as UserSchema;
 
     if (!data) {
-      throw new Error("User not found");
+      new CustomError(
+        `Error while reading data with key '${key}' and value '${value}'`,
+      ).default();
     }
 
     return {
@@ -22,6 +25,10 @@ async function readData(key: string, value: any) {
     } as User;
   }
   catch (error: any) {
-    throw new Error(error.message);
+    console.error(error);
+
+    new CustomError(
+      `Error while reading data with key '${key}' and value '${value}'`,
+    ).func(readData);
   }
 }

@@ -1,10 +1,16 @@
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { config as dotenvConfig } from "dotenv";
+import mongoose from "mongoose";
 
 import { AppModule } from "./app.module";
 
 
+dotenvConfig();
+
 async function bootstrap() {
+  await connectMongoDB(process.env.MONGO_URI);
+
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
@@ -19,3 +25,11 @@ async function bootstrap() {
   await app.listen(process.env.PORT || 3001);
 }
 bootstrap();
+
+async function connectMongoDB(uri: string) {
+  const db = await mongoose.connect(uri, { authSource: "admin" });
+  // eslint-disable-next-line no-console
+  console.log(
+    `Server : successfully connected to MongoDB, Database name: "${db.connections[0].name}"`,
+  );
+}

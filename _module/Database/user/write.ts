@@ -1,25 +1,29 @@
 import { User, UserSchema, UserWrite } from "_types/database/user";
+import { CustomError } from "_module/CustomError";
 import profile from "_module/Database/_schema/user";
 
 
-export function writeById(id: string, dataToSave: UserWrite) {
-  return writeData("_id", id, dataToSave);
+export function editById(id: string, dataToSave: UserWrite) {
+  return editData("_id", id, dataToSave);
 }
 
-async function writeData(key: string, value: any, dataToSave: UserWrite) {
-  try {
-    const data = await profile.findOne({ [key]: value });
-    const code = data ? 1 : 0;
+export async function createNew(dataToSave: UserWrite) {
+  return createData(dataToSave);
+}
 
-    let newData: UserSchema;
-    if (code) {
-      newData = await profile.findOneAndUpdate({ [key]: value }, dataToSave, {
+export async function upsertById(id: string, dataToSave: UserWrite) {
+  return upsertData("_id", id, dataToSave);
+}
+
+async function editData(key: string, value: any, dataToSave: UserWrite) {
+  try {
+    const newData = (await profile.findOneAndUpdate(
+      { [key]: value },
+      dataToSave,
+      {
         new: true
-      });
-    }
-    else {
-      newData = (await profile.create(dataToSave)) as unknown as UserSchema;
-    }
+      },
+    )) as unknown as UserSchema;
 
     return {
       ...newData,
@@ -27,7 +31,9 @@ async function writeData(key: string, value: any, dataToSave: UserWrite) {
     } as User;
   }
   catch (error) {
-    throw new Error(error.message);
+    new CustomError(
+      `Error while editing data with key '${key}' and value '${value}'`,
+    ).func(editData);
   }
 }
 
@@ -41,6 +47,41 @@ async function createData(dataToSave: UserWrite) {
     } as User;
   }
   catch (error) {
-    throw new Error(error.message);
+    console.error(error);
+
+    new CustomError(
+      `Error while creating new user with data:\n${JSON.stringify(
+        dataToSave,
+        null,
+        2,
+      )}`,
+    ).func(createData);
+  }
+}
+
+async function upsertData(key: string, value: any, dataToSave: UserWrite) {
+  try {
+    const newData = (await profile.findOneAndUpdate(
+      { [key]: value },
+      dataToSave,
+      {
+        new: true,
+        upsert: true
+      },
+    )) as unknown as UserSchema;
+
+    return {
+      ...newData,
+      id: newData._id
+    } as User;
+  }
+  catch (error) {
+    throw new Error(
+      `Error while upserting new user with key '${key}', value '${value}' and data:\n${JSON.stringify(
+        dataToSave,
+        null,
+        2,
+      )}`,
+    );
   }
 }
