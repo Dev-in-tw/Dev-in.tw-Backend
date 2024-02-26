@@ -9,9 +9,11 @@ export async function readById(id: string) {
 
 async function readData(key: string, value: any) {
   try {
-    const data = (await profile.findOne({
-      [key]: value
-    })) as unknown as UserSchema;
+    const data = (
+      await profile.findOne({
+        [key]: value
+      })
+    ).toObject() as UserSchema;
 
     if (!data) {
       new CustomError(
@@ -19,10 +21,12 @@ async function readData(key: string, value: any) {
       ).default();
     }
 
-    return {
+    const cleanData = {
+      id: data._id,
       ...data,
-      id: data._id
+      _id: undefined
     } as User;
+    return cleanData;
   }
   catch (error: any) {
     console.error(error);

@@ -17,18 +17,18 @@ export async function upsertById(id: string, dataToSave: UserWrite) {
 
 async function editData(key: string, value: any, dataToSave: UserWrite) {
   try {
-    const newData = (await profile.findOneAndUpdate(
-      { [key]: value },
-      dataToSave,
-      {
+    const newData = (
+      await profile.findOneAndUpdate({ [key]: value }, dataToSave, {
         new: true
-      },
-    )) as unknown as UserSchema;
+      })
+    ).toObject() as UserSchema;
 
-    return {
+    const cleanData = {
+      id: newData._id,
       ...newData,
-      id: newData._id
+      _id: undefined
     } as User;
+    return cleanData;
   }
   catch (error) {
     new CustomError(
@@ -39,12 +39,14 @@ async function editData(key: string, value: any, dataToSave: UserWrite) {
 
 async function createData(dataToSave: UserWrite) {
   try {
-    const newData = (await profile.create(dataToSave)) as unknown as UserSchema;
+    const newData = (await profile.create(dataToSave)).toObject() as UserSchema;
 
-    return {
+    const cleanData = {
+      id: newData._id,
       ...newData,
-      id: newData._id
+      _id: undefined
     } as User;
+    return cleanData;
   }
   catch (error) {
     console.error(error);
@@ -61,19 +63,19 @@ async function createData(dataToSave: UserWrite) {
 
 async function upsertData(key: string, value: any, dataToSave: UserWrite) {
   try {
-    const newData = (await profile.findOneAndUpdate(
-      { [key]: value },
-      dataToSave,
-      {
+    const newData = (
+      await profile.findOneAndUpdate({ [key]: value }, dataToSave, {
         new: true,
         upsert: true
-      },
-    )) as unknown as UserSchema;
+      })
+    ).toObject() as UserSchema;
 
-    return {
+    const cleanData = {
+      id: newData._id,
       ...newData,
-      id: newData._id
+      _id: undefined
     } as User;
+    return cleanData;
   }
   catch (error) {
     throw new Error(
