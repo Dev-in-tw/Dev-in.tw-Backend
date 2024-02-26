@@ -1,6 +1,8 @@
+import { config as dotenvConfig } from "dotenv";
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { config as dotenvConfig } from "dotenv";
+import { SwaggerTheme } from "swagger-themes";
+import { SwaggerThemeNameEnum } from "swagger-themes/build/enums";
 import mongoose from "mongoose";
 
 import { AppModule } from "./app.module";
@@ -20,7 +22,13 @@ async function bootstrap() {
     // .addTag("cats")
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("docs", app, document);
+  const theme = new SwaggerTheme();
+  SwaggerModule.setup(
+    "docs",
+    app,
+    document,
+    theme.getDefaultConfig(SwaggerThemeNameEnum.ONE_DARK),
+  );
 
   await app.listen(process.env.PORT || 3001);
 }
