@@ -14,7 +14,7 @@ async function bootstrap() {
     // .addTag("cats")
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("document", app, document);
+  SwaggerModule.setup("docs", app, document);
 
   await app.listen(process.env.PORT || 3001);
 }
