@@ -3,9 +3,6 @@ export type User = {
   githubId: string;
   email: string;
   name: string;
-  first_name: string;
-  last_name: string;
-  birth: string;
   avatar: string;
   description: string;
   badge: [string];
