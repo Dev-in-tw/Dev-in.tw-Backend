@@ -30,3 +30,17 @@ async function writeData(key: string, value: any, dataToSave: UserWrite) {
     throw new Error(error.message);
   }
 }
+
+async function createData(dataToSave: UserWrite) {
+  try {
+    const newData = (await profile.create(dataToSave)) as unknown as UserSchema;
+
+    return {
+      ...newData,
+      id: newData._id
+    } as User;
+  }
+  catch (error) {
+    throw new Error(error.message);
+  }
+}
