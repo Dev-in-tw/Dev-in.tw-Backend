@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
 
-import { GithubEmailApiResponseDto } from "_types/Github/email-api-response.dto";
-import { GithubUserDataApiResponseDto } from "_types/Github/user-data-api-response.dto";
-import { GithubAccountDataDto } from "_types/github-account-data.dto";
+import { GithubEmailApiResponse } from "_types/Github/email-api-response";
+import { GithubUserDataApiResponse } from "_types/Github/user-data-api-response";
+import { GithubAccountData } from "_types/github-account-data";
 
 
 const GITHUB_ACCESS_TOKEN_API = "https://github.com/login/oauth/access_token";
@@ -12,9 +12,7 @@ const GITHUB_EMAIL_DATA_API = "https://api.github.com/user/emails";
 
 @Injectable()
 export class GithubService {
-  async getGitHubAccountData(
-    code: string,
-  ): Promise<GithubAccountDataDto | null> {
+  async getGitHubAccountData(code: string): Promise<GithubAccountData | null> {
     try {
       const accessToken = await getAccessToken(code);
       const accountData = await getAccountData(accessToken);
@@ -57,14 +55,14 @@ async function getAccessToken(code: string): Promise<string | null> {
 
 async function getAccountData(
   accessToken: string,
-): Promise<GithubAccountDataDto | null> {
+): Promise<GithubAccountData | null> {
   try {
     const userDataResponse = await axios.get(GITHUB_USER_DATA_API, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     });
-    const userData: GithubUserDataApiResponseDto | null =
+    const userData: GithubUserDataApiResponse | null =
       await userDataResponse.data;
     if (!userData) {
       throw new Error("User data not found");
@@ -75,7 +73,7 @@ async function getAccountData(
         Authorization: `Bearer ${accessToken}`
       }
     });
-    const userEmails: [GithubEmailApiResponseDto] | null =
+    const userEmails: [GithubEmailApiResponse] | null =
       await userEmailsResponse.data;
     if (!userEmails) {
       throw new Error("User emails not found");

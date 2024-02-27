@@ -1,4 +1,4 @@
-export class GithubUserDataApiResponseDto {
+export type GithubUserDataApiResponse = {
   login: string;
   id: number;
   node_id: string;
@@ -31,4 +31,4 @@ export class GithubUserDataApiResponseDto {
   following: number;
   created_at: string;
   updated_at: string;
-}
+};
