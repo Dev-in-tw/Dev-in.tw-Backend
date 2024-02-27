@@ -4,6 +4,7 @@ import axios from "axios";
 import { GithubEmailApiResponse } from "_types/Github/email-api-response";
 import { GithubUserDataApiResponse } from "_types/Github/user-data-api-response";
 import { GithubAccountData } from "_types/github-account-data";
+import { CustomError } from "_module/CustomError";
 
 
 const GITHUB_ACCESS_TOKEN_API = "https://github.com/login/oauth/access_token";
@@ -20,7 +21,9 @@ export class GithubService {
       return accountData;
     }
     catch (error) {
-      throw new Error("Error while getting GitHub account data");
+      new CustomError(
+        `Error while getting GitHub account data, error: ${error.message}`,
+      ).default();
     }
   }
 }
@@ -43,13 +46,15 @@ async function getAccessToken(code: string): Promise<string | null> {
     );
     const { access_token: accessToken } = await accessTokenResponse.data;
     if (!accessToken) {
-      throw new Error("Access token not found");
+      new CustomError(`Access token not found with code '${code}'`).default();
     }
 
     return accessToken;
   }
   catch (error) {
-    throw new Error("Error while getting access token");
+    new CustomError(
+      `Error while getting access token with code '${code}'`,
+    ).func(getAccessToken);
   }
 }
 
@@ -65,7 +70,9 @@ async function getAccountData(
     const userData: GithubUserDataApiResponse | null =
       await userDataResponse.data;
     if (!userData) {
-      throw new Error("User data not found");
+      new CustomError(
+        `User data not found with access token '${accessToken}'`,
+      ).default();
     }
 
     const userEmailsResponse = await axios.get(GITHUB_EMAIL_DATA_API, {
@@ -76,17 +83,25 @@ async function getAccountData(
     const userEmails: [GithubEmailApiResponse] | null =
       await userEmailsResponse.data;
     if (!userEmails) {
-      throw new Error("User emails not found");
+      new CustomError("User emails not found").default();
     }
 
     const primaryEmail = userEmails.find((email) => email.primary);
     if (!primaryEmail) {
-      throw new Error("Primary email not found");
+      new CustomError(
+        `Primary email not found in user emails:\n${JSON.stringify(
+          userEmails,
+          null,
+          2,
+        )}`,
+      ).default();
     }
 
     return { ...userData, primary_email: primaryEmail };
   }
   catch (error) {
-    throw new Error("Error while getting account data");
+    new CustomError(
+      `Error while getting user data from GitHub, error: ${error.message}`,
+    ).func(getAccountData);
   }
 }

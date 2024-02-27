@@ -78,12 +78,12 @@ async function upsertData(key: string, value: any, dataToSave: UserWrite) {
     return cleanData;
   }
   catch (error) {
-    throw new Error(
+    new CustomError(
       `Error while upserting new user with key '${key}', value '${value}' and data:\n${JSON.stringify(
         dataToSave,
         null,
         2,
       )}`,
-    );
+    ).func(upsertData);
   }
 }
