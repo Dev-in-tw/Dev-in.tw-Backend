@@ -4,14 +4,11 @@ import { Schema, model } from "mongoose";
 const userSchema = new Schema(
   {
     githubId: String,
-    email: String,
+    primaryEmail: String,
     name: String,
-    first_name: String,
-    last_name: String,
-    birth: String,
     avatar: String,
     description: String,
-    badge: [String],
+    badge: [String] || [],
     beta: Boolean,
     warn: Number,
     disabled: Boolean,

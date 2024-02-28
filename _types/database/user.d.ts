@@ -1,11 +1,11 @@
 export type User = {
   id: string;
   githubId: string;
-  email: string;
+  primaryEmail: string;
   name: string;
   avatar: string;
   description: string;
-  badge: [string];
+  badge: [string] | [];
   beta: boolean;
   warn: number;
   disabled: boolean;

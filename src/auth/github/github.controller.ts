@@ -16,15 +16,20 @@ export class GithubController {
     @Res() res: Response,
   ) {
     try {
-      const accountData = await this.githubService.getGitHubAccountData(
+      const githubAccountData = await this.githubService.getGitHubAccountData(
         data.code,
       );
 
+      const userAccountData = await this.githubService.upsertUser(
+        githubAccountData,
+      );
+
       return res.status(HttpStatus.OK).json({
-        account_data: accountData
+        account_data: userAccountData
       });
     }
     catch (error) {
+      console.error(error);
       return res.status(HttpStatus.UNAUTHORIZED).json({
         error: "Please provide a valid authentication code"
       });

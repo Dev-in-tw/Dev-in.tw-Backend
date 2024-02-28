@@ -13,11 +13,9 @@ export async function readByGithubId(githubId: string) {
 
 async function readData(key: keyof UserSchema, value: any) {
   try {
-    const data = (
-      await profile.findOne({
-        [key]: value
-      })
-    ).toObject() as UserSchema;
+    const data = await profile.findOne({
+      [key]: value
+    });
 
     if (!data) {
       new CustomError(
@@ -25,16 +23,16 @@ async function readData(key: keyof UserSchema, value: any) {
       ).default();
     }
 
+    const dataToReturn = data.toObject() as UserSchema;
+
     const cleanData = {
-      id: data._id,
-      ...data,
+      id: dataToReturn._id,
+      ...dataToReturn,
       _id: undefined
     } as User;
     return cleanData;
   }
   catch (error: any) {
-    console.error(error);
-
     new CustomError(
       `Error while reading data with key '${key}' and value '${value}'`,
     ).func(readData);
