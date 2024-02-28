@@ -7,6 +7,10 @@ export async function readById(id: string) {
   return await readData("_id", id);
 }
 
+export async function readByGithubId(githubId: string) {
+  return await readData("githubId", githubId);
+}
+
 async function readData(key: keyof UserSchema, value: any) {
   try {
     const data = (
