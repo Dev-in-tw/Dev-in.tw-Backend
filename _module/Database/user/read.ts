@@ -7,7 +7,7 @@ export async function readById(id: string) {
   return await readData("_id", id);
 }
 
-async function readData(key: string, value: any) {
+async function readData(key: keyof UserSchema, value: any) {
   try {
     const data = (
       await profile.findOne({

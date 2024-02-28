@@ -15,7 +15,11 @@ export async function upsertById(id: string, dataToSave: UserWrite) {
   return upsertData("_id", id, dataToSave);
 }
 
-async function editData(key: string, value: any, dataToSave: UserWrite) {
+async function editData(
+  key: keyof UserSchema,
+  value: any,
+  dataToSave: UserWrite,
+) {
   try {
     const newData = (
       await profile.findOneAndUpdate({ [key]: value }, dataToSave, {
@@ -61,7 +65,11 @@ async function createData(dataToSave: UserWrite) {
   }
 }
 
-async function upsertData(key: string, value: any, dataToSave: UserWrite) {
+async function upsertData(
+  key: keyof UserSchema,
+  value: any,
+  dataToSave: UserWrite,
+) {
   try {
     const newData = (
       await profile.findOneAndUpdate({ [key]: value }, dataToSave, {
