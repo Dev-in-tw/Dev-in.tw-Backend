@@ -4,7 +4,7 @@ import { Response } from "express";
 import { TestDto } from "_types/test.dto";
 import { HttpStatus } from "_status-code/HTTP";
 import { CustomError } from "_module/CustomError";
-import { UserDB } from "_module/Database";
+import { User as UserDB } from "_module/Database";
 
 
 @Controller("test")
@@ -22,7 +22,7 @@ export class TestController {
       let data: any;
       switch (input.method) {
         case "edit": {
-          data = await UserDB.write.editById("test", {
+          data = await UserDB.edit.byId("65dcb453b3d5725f6b936850", {
             githubId: "test data"
           });
           break;
@@ -36,7 +36,7 @@ export class TestController {
         }
 
         case "read": {
-          data = await UserDB.read.readById("65dcb453b3d5725f6b936850");
+          data = await UserDB.read.byId("65dcb453b3d5725f6b936850");
           break;
         }
 
