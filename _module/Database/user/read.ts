@@ -1,6 +1,7 @@
 import { User, UserSchema } from "_types/database/user";
 import { CustomError } from "_module/CustomError";
 import profile from "_module/Database/_schema/user";
+import { cleanDbObject } from "_module/CleanDbObject";
 
 
 export async function readById(id: string) {
@@ -25,11 +26,7 @@ async function readData(key: keyof UserSchema, value: any) {
 
     const dataToReturn = data.toObject() as UserSchema;
 
-    const cleanData = {
-      id: dataToReturn._id,
-      ...dataToReturn,
-      _id: undefined
-    } as User;
+    const cleanData = cleanDbObject<User>(dataToReturn);
     return cleanData;
   }
   catch (error: any) {

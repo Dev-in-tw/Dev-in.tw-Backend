@@ -25,6 +25,9 @@ export class User {
   static edit = {
     byId: async (id: string, dataToSave: UserWrite) => {
       return await userFunction.editById(id, dataToSave);
+    },
+    byGithubId: async (githubId: string, dataToSave: UserWrite) => {
+      return await userFunction.editByGithubId(githubId, dataToSave);
     }
   };
 }

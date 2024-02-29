@@ -42,13 +42,11 @@ export class GithubService {
         premium: user?.premium || false
       };
 
-      console.log(githubDataToDbData);
-
       if (user) {
-        return UserDB.edit.byId(user.githubId, githubDataToDbData);
+        return UserDB.edit.byGithubId(user.githubId, githubDataToDbData);
       }
 
-      return UserDB.write.create(githubAccountData);
+      return UserDB.write.create(githubDataToDbData);
     }
     catch (error) {
       new CustomError(

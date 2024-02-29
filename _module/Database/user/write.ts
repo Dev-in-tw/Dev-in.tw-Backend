@@ -1,10 +1,15 @@
 import { User, UserSchema, UserWrite } from "_types/database/user";
 import { CustomError } from "_module/CustomError";
 import profile from "_module/Database/_schema/user";
+import { cleanDbObject } from "_module/CleanDbObject";
 
 
 export function editById(id: string, dataToSave: UserWrite) {
   return editData("_id", id, dataToSave);
+}
+
+export function editByGithubId(id: string, dataToSave: UserWrite) {
+  return editData("githubId", id, dataToSave);
 }
 
 export async function createNew(dataToSave: UserWrite) {
@@ -27,11 +32,7 @@ async function editData(
       })
     ).toObject() as UserSchema;
 
-    const cleanData = {
-      id: newData._id,
-      ...newData,
-      _id: undefined
-    } as User;
+    const cleanData = cleanDbObject<User>(newData);
     return cleanData;
   }
   catch (error) {
@@ -45,11 +46,7 @@ async function createData(dataToSave: UserWrite) {
   try {
     const newData = (await profile.create(dataToSave)).toObject() as UserSchema;
 
-    const cleanData = {
-      id: newData._id,
-      ...newData,
-      _id: undefined
-    } as User;
+    const cleanData = cleanDbObject<User>(newData);
     return cleanData;
   }
   catch (error) {
@@ -78,11 +75,7 @@ async function upsertData(
       })
     ).toObject() as UserSchema;
 
-    const cleanData = {
-      id: newData._id,
-      ...newData,
-      _id: undefined
-    } as User;
+    const cleanData = cleanDbObject<User>(newData);
     return cleanData;
   }
   catch (error) {

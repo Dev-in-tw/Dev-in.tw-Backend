@@ -1,5 +1,12 @@
 import { readByGithubId, readById } from "./read";
-import { createNew, editById, upsertById } from "./write";
+import { createNew, editByGithubId, editById, upsertById } from "./write";
 
 
-export { editById, createNew, readById, readByGithubId, upsertById };
+export {
+  editById,
+  editByGithubId,
+  createNew,
+  readById,
+  readByGithubId,
+  upsertById
+};

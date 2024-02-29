@@ -1,9 +1,10 @@
 import { Body, Controller, Post, Res } from "@nestjs/common";
 import { Response } from "express";
 
+import { GithubService } from "./github.service";
 import { HttpStatus } from "_status-code/HTTP";
 import { GithubAuthCodeDto } from "_types/github-auth-code.dto";
-import { GithubService } from "./github.service";
+import { JWT } from "_module/JWT";
 
 
 @Controller("auth/github")
@@ -24,8 +25,13 @@ export class GithubController {
         githubAccountData,
       );
 
+      const token = new JWT({
+        githubId: userAccountData.githubId
+      }).sign();
+
       return res.status(HttpStatus.OK).json({
-        account_data: userAccountData
+        accountData: userAccountData,
+        token
       });
     }
     catch (error) {

@@ -35,7 +35,10 @@ async function bootstrap() {
 bootstrap();
 
 async function connectMongoDB(uri: string) {
-  const db = await mongoose.connect(uri, { authSource: "admin" });
+  const db = await mongoose.connect(uri, {
+    authSource: "admin",
+    dbName: "backend"
+  });
   // eslint-disable-next-line no-console
   console.log(
     `Server : successfully connected to MongoDB, Database name: "${db.connections[0].name}"`,
