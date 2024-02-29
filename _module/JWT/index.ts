@@ -9,7 +9,7 @@ import {
 
 export class JWT {
   token: string | null = null;
-  payload: object | null = null;
+  payload: JwtPayload | null = null;
 
   constructor(input: string | object) {
     if (typeof input === "string") {
@@ -25,7 +25,9 @@ export class JWT {
       return this.token;
     }
     else if (this.payload) {
-      this.token = jwtSign(this.payload, process.env.JWT_SECRET);
+      this.token = jwtSign(this.payload, process.env.JWT_SECRET, {
+        expiresIn: "3d"
+      });
       return this.token;
     }
     else {
