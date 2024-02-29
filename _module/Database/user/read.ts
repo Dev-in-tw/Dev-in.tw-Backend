@@ -12,6 +12,10 @@ export async function readByGithubId(githubId: string) {
   return await readData("githubId", githubId);
 }
 
+export async function readByUserName(userName: string) {
+  return await readData("userName", userName);
+}
+
 async function readData(key: keyof UserSchema, value: any) {
   try {
     const data = await profile.findOne({

@@ -3,6 +3,7 @@ import { Schema, model } from "mongoose";
 
 const userSchema = new Schema(
   {
+    userName: String,
     githubId: String,
     primaryEmail: String,
     name: String,

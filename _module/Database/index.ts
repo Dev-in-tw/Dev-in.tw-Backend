@@ -10,6 +10,9 @@ export class User {
     },
     byGithubId: async (githubId: string) => {
       return await userFunction.readByGithubId(githubId);
+    },
+    byUserName: async (userName: string) => {
+      return await userFunction.readByUserName(userName);
     }
   };
 

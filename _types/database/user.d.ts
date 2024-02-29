@@ -1,5 +1,6 @@
 export type User = {
   id: string;
+  userName: string;
   githubId: string;
   primaryEmail: string;
   name: string;
@@ -13,6 +14,11 @@ export type User = {
   createdAt: NativeDate;
   updatedAt: NativeDate;
 };
+
+export type UserPublic = Omit<
+  User,
+  "githubId" | "primaryEmail" | "beta" | "warn" | "updatedAt"
+>;
 
 export type UserWrite = Partial<Omit<User, "id" | "createdAt" | "updatedAt">>;
 

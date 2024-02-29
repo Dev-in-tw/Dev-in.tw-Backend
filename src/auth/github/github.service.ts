@@ -30,6 +30,7 @@ export class GithubService {
         .catch(() => null);
 
       const githubDataToDbData: UserWrite = {
+        userName: githubAccountData.login,
         githubId: githubAccountData.id.toString(),
         primaryEmail: githubAccountData.primary_email.email,
         name: githubAccountData.name,
