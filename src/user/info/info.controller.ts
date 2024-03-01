@@ -4,8 +4,9 @@ import { Response } from "express";
 
 import { InfoService } from "./info.service";
 import { VerifiedRequest } from "_types/request";
-import { User, UserPublic } from "_types/database/user.dto";
+import { UserPublic } from "_types/database/user.dto";
 import { HttpStatus } from "_status-code/HTTP";
+import { SwaggerMetadata } from "_swagger";
 
 
 @Controller("user/info")
@@ -21,20 +22,10 @@ export class InfoController {
       required: true
     }
   ])
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: User,
-    description: "Get private user info"
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    schema: {
-      example: {
-        error: "Please provide a valid token"
-      }
-    },
-    description: "User not found"
-  })
+  @ApiResponse(SwaggerMetadata.root.user.info._.apiResponse["@Get"].OK)
+  @ApiResponse(
+    SwaggerMetadata.root.user.info._.apiResponse["@Get"].UNAUTHORIZED,
+  )
   async getUserInfo(@Req() req: VerifiedRequest, @Res() res: Response) {
     try {
       const userInfo = await this.infoService.getUserInfoByGithubId(
@@ -52,31 +43,10 @@ export class InfoController {
 
   @Get(":userName")
   @ApiTags("User")
-  @ApiResponse({
-    status: HttpStatus.OK,
-    schema: {
-      properties: {
-        accountData: {
-          type: "string"
-        }
-      }
-    },
-    description: "Get public user info by user name"
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    schema: {
-      properties: {
-        error: {
-          type: "string"
-        }
-      },
-      example: {
-        error: "Please provide a valid user name"
-      }
-    },
-    description: "User not found"
-  })
+  @ApiResponse(SwaggerMetadata.root.user.info.$userName.apiResponse["@Get"].OK)
+  @ApiResponse(
+    SwaggerMetadata.root.user.info.$userName.apiResponse["@Get"].NOT_FOUND,
+  )
   async getUserInfoByUserName(
     @Res() res: Response,
     @Param("userName") userName: string,
