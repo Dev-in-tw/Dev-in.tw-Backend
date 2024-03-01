@@ -1,10 +1,12 @@
 import { config as dotenvConfig } from "dotenv";
 import { NestFactory } from "@nestjs/core";
+import { Logger } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { SwaggerTheme } from "swagger-themes";
 import { SwaggerThemeNameEnum } from "swagger-themes/build/enums";
 import mongoose from "mongoose";
 
+import packageJson from "../package.json";
 import { AppModule } from "./app.module";
 
 
@@ -13,13 +15,12 @@ dotenvConfig();
 async function bootstrap() {
   await connectMongoDB(process.env.MONGO_URI);
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   const config = new DocumentBuilder()
     .setTitle("Dev-in.tw API Document")
-    // .setDescription("The Dev-in.tw API description")
-    .setVersion("1.0")
-    // .addTag("cats")
+    .setDescription("Dev-in.tw Backend API")
+    .setVersion(packageJson.version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   const theme = new SwaggerTheme();
@@ -35,12 +36,12 @@ async function bootstrap() {
 bootstrap();
 
 async function connectMongoDB(uri: string) {
+  const logger = new Logger("MongoDB");
+
   const db = await mongoose.connect(uri, {
     authSource: "admin",
     dbName: "backend"
   });
-  // eslint-disable-next-line no-console
-  console.log(
-    `Server : successfully connected to MongoDB, Database name: "${db.connections[0].name}"`,
-  );
+
+  logger.log(`Successfully connected to database "${db.connections[0].name}"`);
 }
