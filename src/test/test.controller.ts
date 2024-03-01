@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
 import { TestDto } from "_types/test.dto";
@@ -10,6 +11,7 @@ import { User as UserDB } from "_module/Database";
 @Controller("test")
 export class TestController {
   @Get()
+  @ApiTags("Test")
   getTest() {
     return {
       message: "test route"
@@ -17,6 +19,7 @@ export class TestController {
   }
 
   @Post()
+  @ApiTags("Test")
   async getGitHubAccountData(@Body() input: TestDto, @Res() res: Response) {
     try {
       let data: any;

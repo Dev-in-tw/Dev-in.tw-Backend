@@ -1,6 +1,6 @@
 import * as userFunction from "./user";
 
-import { UserWrite } from "_types/database/user";
+import { UserWrite } from "_types/database/user.dto";
 
 
 export class User {

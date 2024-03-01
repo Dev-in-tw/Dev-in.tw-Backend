@@ -1,4 +1,5 @@
 import { Body, Controller, Post, Res } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
 import { GithubService } from "./github.service";
@@ -12,6 +13,7 @@ export class GithubController {
   constructor(private githubService: GithubService) {}
 
   @Post()
+  @ApiTags("GitHub Login")
   async getGitHubAccountData(
     @Body() data: GithubAuthCodeDto,
     @Res() res: Response,

@@ -21,6 +21,8 @@ async function bootstrap() {
     .setTitle("Dev-in.tw API Document")
     .setDescription("Dev-in.tw Backend API")
     .setVersion(packageJson.version)
+    .addServer("http://localhost:3000/", "Local")
+    .addServer("https://api-dev.dev-in.tw/", "Development")
     .build();
   const document = SwaggerModule.createDocument(app, config);
   const theme = new SwaggerTheme();

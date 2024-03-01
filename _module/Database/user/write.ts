@@ -1,4 +1,4 @@
-import { User, UserSchema, UserWrite } from "_types/database/user";
+import { User, UserSchema, UserWrite } from "_types/database/user.dto";
 import { CustomError } from "_module/CustomError";
 import profile from "_module/Database/_schema/user";
 import { cleanDbObject } from "_module/CleanDbObject";

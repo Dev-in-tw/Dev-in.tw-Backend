@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import { GithubAccountData } from "_types/github-account-data";
-import { User, UserWrite } from "_types/database/user";
+import { User, UserWrite } from "_types/database/user.dto";
 import { CustomError } from "_module/CustomError";
 import { Github as GitHubAPI } from "_module/Github";
 import { User as UserDB } from "_module/Database";
