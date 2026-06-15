@@ -61,5 +61,12 @@ export type DomainLean = FlattenMaps<Domain> & {
   updatedAt: Date;
 };
 
-/** Public shape returned by the service: `_id`/`__v` normalised to `id`. */
-export type DomainPublic = Omit<DomainLean, "_id"> & { id: string };
+/**
+ * Public shape returned by the service. Exposes both `id` (used internally) and
+ * `_id` (the frontend `domainType` reads `_id`), mirroring how the user
+ * controller surfaces `accountData._id`.
+ */
+export type DomainPublic = Omit<DomainLean, "_id"> & {
+  id: string;
+  _id: string;
+};

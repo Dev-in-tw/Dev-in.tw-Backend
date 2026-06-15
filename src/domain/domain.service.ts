@@ -296,7 +296,9 @@ export class DomainService {
     }
 
     const { _id, ...rest } = doc;
-    const result = { id: _id.toString(), ...rest } as DomainPublic & {
+    const idStr = _id.toString();
+    // Expose both `id` and `_id` so the frontend (which reads `_id`) works.
+    const result = { id: idStr, _id: idStr, ...rest } as DomainPublic & {
       __v?: number;
     };
     result.__v = undefined;
