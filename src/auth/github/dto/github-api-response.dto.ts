@@ -1,3 +1,12 @@
+/** Shape of an entry returned by GitHub's `GET /user/emails` endpoint. */
+export class GithubEmailApiResponseDto {
+  email: string;
+  verified: boolean;
+  primary: boolean;
+  visibility: null | "public" | "private";
+}
+
+/** Shape returned by GitHub's `GET /user` endpoint. */
 export class GithubUserDataApiResponseDto {
   login: string;
   id: number;

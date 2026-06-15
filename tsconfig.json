@@ -1,21 +1,39 @@
 {
   "compilerOptions": {
+    // --- Module / emit (pinned: do NOT inherit TS6 esnext/bundler defaults) ---
     "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
+    "moduleResolution": "node10",
+    "target": "ES2023",
     "outDir": "./dist",
-    "baseUrl": "./",
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": true,
     "incremental": true,
+    // node10 is deprecated in TS6 (removed in TS7); bridge until migrating to nodenext
+    "ignoreDeprecations": "6.0",
+
+    // --- Decorators (still supported in TS6; NestJS requires both) ---
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // Keep TSC's original class-field semantics so decorated DTO / @Prop fields
+    // are not overwritten with undefined under target >= ES2022.
+    "useDefineForClassFields": false,
+
+    // --- Interop (forced-on in TS6; kept explicit for clarity) ---
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // --- Type roots (TS6 default is now []); jest for *.spec.ts type-checking ---
+    "types": ["node", "jest"],
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+
+    // --- Strictness ---
+    "strict": true,
+    // NestJS DTO / @Schema classes declare fields without initializers; the
+    // decorators/ValidationPipe populate them, so disable this one strict check.
+    "strictPropertyInitialization": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true
   }
 }

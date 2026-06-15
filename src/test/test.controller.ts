@@ -1,58 +1,47 @@
-import { Body, Controller, Get, Post, Res } from "@nestjs/common";
-import { Response } from "express";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+} from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 
-import { TestDto } from "_types/test.dto";
-import { HttpStatus } from "_status-code/HTTP";
-import { CustomError } from "_module/CustomError";
-import { UserDB } from "_module/Database";
+import { UserService } from "../user/user.service";
+import { TestDto, TestMethod } from "./dto/test.dto";
 
-
+@ApiTags("test")
 @Controller("test")
 export class TestController {
+  constructor(private readonly userService: UserService) {}
+
   @Get()
-  getTest() {
-    return {
-      message: "test route"
-    };
+  getTest(): { message: string } {
+    return { message: "test route" };
   }
 
   @Post()
-  async getGitHubAccountData(@Body() input: TestDto, @Res() res: Response) {
-    try {
-      let data: any;
-      switch (input.method) {
-        case "edit": {
-          data = await UserDB.write.editById("test", {
-            githubId: "test data"
-          });
-          break;
-        }
+  async runUserDbMethod(@Body() body: TestDto): Promise<{ data: unknown }> {
+    switch (body.method) {
+      case TestMethod.Edit:
+        return {
+          data: await this.userService.editById("test", {
+            githubId: "test data",
+          }),
+        };
 
-        case "create": {
-          data = await UserDB.write.create({
-            githubId: "test data"
-          });
-          break;
-        }
+      case TestMethod.Create:
+        return {
+          data: await this.userService.createNew({ githubId: "test data" }),
+        };
 
-        case "read": {
-          data = await UserDB.read.readById("65dcb453b3d5725f6b936850");
-          break;
-        }
+      case TestMethod.Read:
+        return {
+          data: await this.userService.readById("65dcb453b3d5725f6b936850"),
+        };
 
-        default: {
-          new CustomError("Invalid method provided").default();
-        }
-      }
-
-      return res.status(HttpStatus.OK).json({
-        data
-      });
-    }
-    catch (error) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        error: error.message
-      });
+      default:
+        throw new BadRequestException("Invalid method provided");
     }
   }
 }

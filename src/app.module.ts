@@ -1,28 +1,44 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_GUARD } from "@nestjs/core";
+import { MongooseModule } from "@nestjs/mongoose";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { AppController } from "./app.controller";
-import { DefaultFallbackModule } from "../_module/DefaultFallback/default-fallback.module";
-import { LoggerMiddleware } from "../_module/AppLogger/logger.middleware";
+import { AuthModule } from "./auth/auth.module";
+import { FallbackModule } from "./common/fallback/fallback.module";
+import { LoggerMiddleware } from "./common/middleware/logger.middleware";
+import { validateEnv } from "./config/env.validation";
 import { TestModule } from "./test/test.module";
 import { UserModule } from "./user/user.module";
-import { AuthModule } from "./auth/auth.module";
-
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ".env"
+      isGlobal: true,
+      envFilePath: ".env",
+      validate: validateEnv,
     }),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        uri: config.getOrThrow<string>("MONGO_URI"),
+        authSource: "admin",
+      }),
+    }),
+    ThrottlerModule.forRoot([{ name: "default", ttl: 60_000, limit: 100 }]),
     TestModule,
     UserModule,
     AuthModule,
-    DefaultFallbackModule
+    // FallbackModule must stay LAST so its catch-all route does not shadow others.
+    FallbackModule,
   ],
-  controllers: [AppController]
+  controllers: [AppController],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes("*");
+  configure(consumer: MiddlewareConsumer): void {
+    // Express 5: "*" -> named wildcard "{*splat}"
+    consumer.apply(LoggerMiddleware).forRoutes("{*splat}");
   }
 }

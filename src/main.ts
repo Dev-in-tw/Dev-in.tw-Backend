@@ -1,35 +1,38 @@
+import "reflect-metadata";
+
+import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { config as dotenvConfig } from "dotenv";
-import mongoose from "mongoose";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
+import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 
-
-dotenvConfig();
-
-async function bootstrap() {
-  await connectMongoDB(process.env.MONGO_URI);
-
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  const config = new DocumentBuilder()
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  const swaggerConfig = new DocumentBuilder()
     .setTitle("Dev-in.tw API Document")
-    // .setDescription("The Dev-in.tw API description")
     .setVersion("1.0")
-    // .addTag("cats")
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("docs", app, document);
 
-  await app.listen(process.env.PORT || 3001);
-}
-bootstrap();
+  const configService = app.get(ConfigService);
+  // `|| 3001` (not `??`) so an empty PORT="" also falls back instead of binding a random port.
+  const port = configService.get<number>("PORT") || 3001;
 
-async function connectMongoDB(uri: string) {
-  const db = await mongoose.connect(uri, { authSource: "admin" });
-  // eslint-disable-next-line no-console
-  console.log(
-    `Server : successfully connected to MongoDB, Database name: "${db.connections[0].name}"`,
-  );
+  await app.listen(port);
 }
+
+void bootstrap();

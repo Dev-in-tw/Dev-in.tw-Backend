@@ -1,10 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import axios from "axios";
 
-import { GithubEmailApiResponseDto } from "_types/Github/email-api-response.dto";
-import { GithubUserDataApiResponseDto } from "_types/Github/user-data-api-response.dto";
-import { GithubAccountDataDto } from "_types/github-account-data.dto";
-
+import { GithubAccountDataDto } from "./dto/github-account-data.dto";
+import {
+  GithubEmailApiResponseDto,
+  GithubUserDataApiResponseDto,
+} from "./dto/github-api-response.dto";
 
 const GITHUB_ACCESS_TOKEN_API = "https://github.com/login/oauth/access_token";
 const GITHUB_USER_DATA_API = "https://api.github.com/user";
@@ -12,83 +14,74 @@ const GITHUB_EMAIL_DATA_API = "https://api.github.com/user/emails";
 
 @Injectable()
 export class GithubService {
-  async getGitHubAccountData(
-    code: string,
-  ): Promise<GithubAccountDataDto | null> {
-    try {
-      const accessToken = await getAccessToken(code);
-      const accountData = await getAccountData(accessToken);
+  private readonly logger = new Logger(GithubService.name);
 
-      return accountData;
-    }
-    catch (error) {
-      throw new Error("Error while getting GitHub account data");
+  constructor(private readonly configService: ConfigService) {}
+
+  async getGitHubAccountData(code: string): Promise<GithubAccountDataDto> {
+    try {
+      const accessToken = await this.getAccessToken(code);
+      return await this.getAccountData(accessToken);
+    } catch (error) {
+      this.logger.error(
+        "GitHub OAuth exchange failed",
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw new UnauthorizedException(
+        "Please provide a valid authentication code",
+      );
     }
   }
-}
 
-async function getAccessToken(code: string): Promise<string | null> {
-  try {
-    const accessTokenResponse = await axios.post(
+  private async getAccessToken(code: string): Promise<string> {
+    const response = await axios.post(
       GITHUB_ACCESS_TOKEN_API,
       {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        client_id: this.configService.getOrThrow<string>("GITHUB_CLIENT_ID"),
+        client_secret: this.configService.getOrThrow<string>(
+          "GITHUB_CLIENT_SECRET",
+        ),
         scope: "user:email",
-        code
+        code,
       },
-      {
-        headers: {
-          Accept: "application/json"
-        }
-      },
+      { headers: { Accept: "application/json" } },
     );
-    const { access_token: accessToken } = await accessTokenResponse.data;
+
+    const accessToken: string | undefined = response.data?.access_token;
     if (!accessToken) {
       throw new Error("Access token not found");
     }
 
     return accessToken;
   }
-  catch (error) {
-    throw new Error("Error while getting access token");
-  }
-}
 
-async function getAccountData(
-  accessToken: string,
-): Promise<GithubAccountDataDto | null> {
-  try {
-    const userDataResponse = await axios.get(GITHUB_USER_DATA_API, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-    const userData: GithubUserDataApiResponseDto | null =
-      await userDataResponse.data;
+  private async getAccountData(
+    accessToken: string,
+  ): Promise<GithubAccountDataDto> {
+    const headers = { Authorization: `Bearer ${accessToken}` };
+
+    // The profile and email endpoints are independent — fetch them in parallel.
+    const [userDataResponse, userEmailsResponse] = await Promise.all([
+      axios.get<GithubUserDataApiResponseDto>(GITHUB_USER_DATA_API, {
+        headers,
+      }),
+      axios.get<GithubEmailApiResponseDto[]>(GITHUB_EMAIL_DATA_API, {
+        headers,
+      }),
+    ]);
+
+    const userData = userDataResponse.data;
     if (!userData) {
       throw new Error("User data not found");
     }
 
-    const userEmailsResponse = await axios.get(GITHUB_EMAIL_DATA_API, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-    const userEmails: [GithubEmailApiResponseDto] | null =
-      await userEmailsResponse.data;
-    if (!userEmails) {
-      throw new Error("User emails not found");
-    }
-
-    const primaryEmail = userEmails.find((email) => email.primary);
+    const primaryEmail = userEmailsResponse.data?.find(
+      (email) => email.primary,
+    );
     if (!primaryEmail) {
       throw new Error("Primary email not found");
     }
 
     return { ...userData, primary_email: primaryEmail };
-  }
-  catch (error) {
-    throw new Error("Error while getting account data");
   }
 }

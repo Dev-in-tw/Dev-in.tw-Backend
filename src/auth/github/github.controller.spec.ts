@@ -1,14 +1,20 @@
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { GithubController } from "./github.controller";
-
+import { GithubService } from "./github.service";
 
 describe("GithubController", () => {
   let controller: GithubController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [GithubController]
+      controllers: [GithubController],
+      providers: [
+        {
+          provide: GithubService,
+          useValue: { getGitHubAccountData: jest.fn() },
+        },
+      ],
     }).compile();
 
     controller = module.get<GithubController>(GithubController);

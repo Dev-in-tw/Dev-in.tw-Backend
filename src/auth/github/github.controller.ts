@@ -1,33 +1,24 @@
-import { Body, Controller, Post, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 
-import { HttpStatus } from "_status-code/HTTP";
-import { GithubAuthCodeDto } from "_types/github-auth-code.dto";
+import { GithubAccountDataDto } from "./dto/github-account-data.dto";
+import { GithubAuthCodeDto } from "./dto/github-auth-code.dto";
 import { GithubService } from "./github.service";
 
-
+@ApiTags("auth")
 @Controller("auth/github")
 export class GithubController {
-  constructor(private githubService: GithubService) {}
+  constructor(private readonly githubService: GithubService) {}
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async getGitHubAccountData(
-    @Body() data: GithubAuthCodeDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const accountData = await this.githubService.getGitHubAccountData(
-        data.code,
-      );
+    @Body() body: GithubAuthCodeDto,
+  ): Promise<{ account_data: GithubAccountDataDto }> {
+    const accountData = await this.githubService.getGitHubAccountData(
+      body.code,
+    );
 
-      return res.status(HttpStatus.OK).json({
-        account_data: accountData
-      });
-    }
-    catch (error) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        error: "Please provide a valid authentication code"
-      });
-    }
+    return { account_data: accountData };
   }
 }
