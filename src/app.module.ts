@@ -6,9 +6,11 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { AppController } from "./app.controller";
 import { AuthModule } from "./auth/auth.module";
+import { CloudflareModule } from "./cloudflare/cloudflare.module";
 import { FallbackModule } from "./common/fallback/fallback.module";
 import { LoggerMiddleware } from "./common/middleware/logger.middleware";
 import { validateEnv } from "./config/env.validation";
+import { DomainModule } from "./domain/domain.module";
 import { TestModule } from "./test/test.module";
 import { UserModule } from "./user/user.module";
 
@@ -30,6 +32,8 @@ import { UserModule } from "./user/user.module";
     TestModule,
     UserModule,
     AuthModule,
+    CloudflareModule,
+    DomainModule,
     // FallbackModule must stay LAST so its catch-all route does not shadow others.
     FallbackModule,
   ],

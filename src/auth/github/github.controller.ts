@@ -1,7 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 
-import { GithubAccountDataDto } from "./dto/github-account-data.dto";
 import { GithubAuthCodeDto } from "./dto/github-auth-code.dto";
 import { GithubService } from "./github.service";
 
@@ -12,13 +11,7 @@ export class GithubController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async getGitHubAccountData(
-    @Body() body: GithubAuthCodeDto,
-  ): Promise<{ account_data: GithubAccountDataDto }> {
-    const accountData = await this.githubService.getGitHubAccountData(
-      body.code,
-    );
-
-    return { account_data: accountData };
+  async login(@Body() body: GithubAuthCodeDto): Promise<{ token: string }> {
+    return this.githubService.login(body.code);
   }
 }

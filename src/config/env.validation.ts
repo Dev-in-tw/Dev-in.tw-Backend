@@ -28,6 +28,30 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   GITHUB_CLIENT_SECRET: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_SECRET: string;
+
+  @IsOptional()
+  @IsString()
+  JWT_EXPIRES_IN?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  CORS_ORIGIN: string;
+
+  @IsString()
+  @IsNotEmpty()
+  CLOUDFLARE_API_TOKEN: string;
+
+  @IsString()
+  @IsNotEmpty()
+  CLOUDFLARE_ZONE_ID: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ROOT_DOMAIN: string;
 }
 
 export function validateEnv(

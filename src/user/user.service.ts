@@ -48,6 +48,27 @@ export class UserService {
     );
   }
 
+  /**
+   * Creates the user on first GitHub login or updates the existing one, keyed by
+   * the immutable `githubId`. The `githubId` unique index makes concurrent first
+   * logins converge to a single document.
+   */
+  async upsertByGithubId(
+    githubId: string,
+    data: UserWrite,
+  ): Promise<UserPublic> {
+    return this.toPublic(
+      await this.userModel
+        .findOneAndUpdate(
+          { githubId },
+          { $set: data },
+          { new: true, upsert: true, setDefaultsOnInsert: true },
+        )
+        .lean<UserLean>()
+        .exec(),
+    ) as UserPublic;
+  }
+
   /** Normalises a lean document to the public shape (`id` instead of `_id`/`__v`). */
   private toPublic(doc: UserLean | null): UserPublic | null {
     if (!doc) {

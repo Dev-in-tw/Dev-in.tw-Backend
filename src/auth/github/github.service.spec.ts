@@ -1,8 +1,10 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import axios from "axios";
 
+import { UserService } from "../../user/user.service";
 import { GithubService } from "./github.service";
 
 jest.mock("axios");
@@ -24,6 +26,14 @@ describe("GithubService", () => {
           useValue: {
             getOrThrow: jest.fn().mockReturnValue("test-credential"),
           },
+        },
+        {
+          provide: UserService,
+          useValue: { upsertByGithubId: jest.fn() },
+        },
+        {
+          provide: JwtService,
+          useValue: { signAsync: jest.fn() },
         },
       ],
     }).compile();

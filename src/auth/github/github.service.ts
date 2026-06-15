@@ -1,7 +1,10 @@
 import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import axios from "axios";
 
+import { UserService } from "../../user/user.service";
+import { JwtPayload } from "../dto/jwt-payload";
 import { GithubAccountDataDto } from "./dto/github-account-data.dto";
 import {
   GithubEmailApiResponseDto,
@@ -16,7 +19,32 @@ const GITHUB_EMAIL_DATA_API = "https://api.github.com/user/emails";
 export class GithubService {
   private readonly logger = new Logger(GithubService.name);
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  /**
+   * Full login flow: exchange the OAuth code for GitHub profile data, upsert the
+   * user (keyed by GitHub id), then sign and return a JWT for the frontend.
+   */
+  async login(code: string): Promise<{ token: string }> {
+    const data = await this.getGitHubAccountData(code);
+
+    const user = await this.userService.upsertByGithubId(String(data.id), {
+      githubId: String(data.id),
+      name: data.name ?? data.login,
+      avatar: data.avatar_url,
+      email: data.email ?? data.primary_email.email,
+      primaryEmail: data.primary_email.email,
+    });
+
+    const payload: JwtPayload = { sub: user.id };
+    const token = await this.jwtService.signAsync(payload);
+
+    return { token };
+  }
 
   async getGitHubAccountData(code: string): Promise<GithubAccountDataDto> {
     try {

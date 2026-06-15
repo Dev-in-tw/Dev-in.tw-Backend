@@ -12,7 +12,7 @@ describe("GithubController", () => {
       providers: [
         {
           provide: GithubService,
-          useValue: { getGitHubAccountData: jest.fn() },
+          useValue: { login: jest.fn() },
         },
       ],
     }).compile();

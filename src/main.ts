@@ -29,6 +29,13 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup("docs", app, document);
 
   const configService = app.get(ConfigService);
+
+  app.enableCors({
+    origin: configService.getOrThrow<string>("CORS_ORIGIN").split(","),
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  });
+
   // `|| 3001` (not `??`) so an empty PORT="" also falls back instead of binding a random port.
   const port = configService.get<number>("PORT") || 3001;
 

@@ -7,11 +7,14 @@ export type UserDocument = HydratedDocument<User>;
 // pluralise the class name to "users" and silently point at an empty collection).
 @Schema({ timestamps: true, collection: "user" })
 export class User {
-  @Prop()
+  @Prop({ unique: true, index: true })
   githubId: string;
 
   @Prop()
   email: string;
+
+  @Prop()
+  primaryEmail: string;
 
   @Prop()
   name: string;
@@ -24,6 +27,15 @@ export class User {
 
   @Prop()
   birth: string;
+
+  @Prop()
+  identy_id: string;
+
+  @Prop()
+  address: string;
+
+  @Prop()
+  phone: string;
 
   @Prop()
   avatar: string;
